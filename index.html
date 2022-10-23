@@ -102,6 +102,14 @@
             return state;
         }
       }
+      const logger = (store) => (next) => (action) => {
+        console.group(action.type);
+        console.log("The action: ", action);
+        const result = next(action);
+        console.log("The new state: ", store.getState());
+        console.groupEnd();
+        return result;
+      };
 
       const checker = (store) => (next) => (action) => {
         if (
@@ -125,7 +133,7 @@
           todos,
           goals,
         }),
-        Redux.applyMiddleware(checker)
+        Redux.applyMiddleware(checker, logger)
       );
 
       store.subscribe(() => {
