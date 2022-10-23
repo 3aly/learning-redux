@@ -103,7 +103,7 @@
         }
       }
 
-      function checkStore(store, action) {
+      const checker = (store) => (next) => (action) => {
         if (
           action.type === ADD_TODO &&
           action.todo.name.toLowerCase().includes("bitcoin")
@@ -117,13 +117,15 @@
         ) {
           return alert("nope no bitcoin");
         }
-        return store.dispatch(action);
-      }
+        return next(action);
+      };
+
       const store = Redux.createStore(
         Redux.combineReducers({
           todos,
           goals,
-        })
+        }),
+        Redux.applyMiddleware(checker)
       );
 
       store.subscribe(() => {
@@ -139,8 +141,8 @@
         const input = document.getElementById("todo");
         const name = input.value;
         input.value = "";
-        checkStore(
-          store,
+
+        store.dispatch(
           addTodoAction({
             name,
             complete: false,
@@ -154,8 +156,7 @@
         const name = input.value;
         input.value = "";
 
-        checkStore(
-          store,
+        store.dispatch(
           addGoalAction({
             id: generateId(),
             name,
